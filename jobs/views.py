@@ -3,6 +3,9 @@ from . import serializers
 from . import models
 from rest_framework import viewsets
 from . import permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 class IsRecruiter(permissions.BasePermission):
@@ -42,3 +45,13 @@ class JobApplicationView(viewsets.ModelViewSet):
     queryset = models.JobApplication.objects.all()
     serializer_class = serializers.JobApplicationSerializer
     
+class RecruiterNotificationsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'recruiter':
+            return Response({'error': 'Only recruiters can view this'}, status=403)
+
+        notifications = models.Notification.objects.filter(user=request.user).order_by('-created_at')
+        serializer = serializers.NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)

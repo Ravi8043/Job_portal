@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from . import models
 
+
 class JobPostingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.JobPosting
@@ -15,3 +16,9 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         fields = [
             'job_role','resume','cover_letter','portfolio_link','github_link','linkedin_link',
         ]
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Notification
+        fields = ['id', 'message', 'is_read', 'created_at']
