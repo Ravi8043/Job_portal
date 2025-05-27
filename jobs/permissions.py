@@ -1,8 +1,8 @@
-class BasePermission:
-    def has_permission(self, request, view) -> bool:
-        return True
 
-    def has_object_permission(self, request, view, obj) -> bool:
+class BasePermission(object):
+    def has_permission(self, request, view):
+        return True
+    def has_object_permission(self, request, view, obj):
         return True
 
     

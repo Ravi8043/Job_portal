@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from . import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+
 
 # Create your views here.
 class IsRecruiter(permissions.BasePermission):
@@ -25,10 +25,13 @@ class IsApplicant(permissions.BasePermission):
     def has_permission(self, request, view):
         user = request.user
         if not user.is_authenticated:
-            return False
+            print("you're not authenticated")
+            return False   
         if getattr(user, 'is_superuser', False):
-            return True
-        return getattr(user, 'role', None) == 'applicant'
+            print('you are a superuser')
+            return True    
+        print("🔎 Role: ", getattr(user, 'role', 'No role found'))
+        return getattr(user, 'role', None) == 'applicant' 
 
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request, view)
@@ -45,13 +48,11 @@ class JobApplicationView(viewsets.ModelViewSet):
     queryset = models.JobApplication.objects.all()
     serializer_class = serializers.JobApplicationSerializer
     
-class RecruiterNotificationsView(APIView):
-    permission_classes = [IsAuthenticated]
+# class RecruiterNotificationsView(APIView):
+#     def get(self, request):
+#         if request.user.role != 'recruiter':
+#             return Response({'error': 'Only recruiters can view this'}, status=403)
 
-    def get(self, request):
-        if request.user.role != 'recruiter':
-            return Response({'error': 'Only recruiters can view this'}, status=403)
-
-        notifications = models.Notification.objects.filter(user=request.user).order_by('-created_at')
-        serializer = serializers.NotificationSerializer(notifications, many=True)
-        return Response(serializer.data)
+#         notifications = models.Notification.objects.filter(user=request.user).order_by('-created_at')
+#         serializer = serializers.NotificationSerializer(notifications, many=True)
+#         return Response(serializer.data)
