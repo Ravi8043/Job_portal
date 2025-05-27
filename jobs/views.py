@@ -3,8 +3,12 @@ from . import serializers
 from . import models
 from rest_framework import viewsets
 from . import permissions
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db.models.query import QuerySet
+from typing import Any
+from .models import Notification
 
 
 # Create your views here.
@@ -57,11 +61,25 @@ class JobApplicationView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(applied_by=self.request.user)  # Crucial line
     
-# class RecruiterNotificationsView(APIView):
-#     def get(self, request):
-#         if request.user.role != 'recruiter':
-#             return Response({'error': 'Only recruiters can view this'}, status=403)
 
-#         notifications = models.Notification.objects.filter(user=request.user).order_by('-created_at')
-#         serializer = serializers.NotificationSerializer(notifications, many=True)
-#         return Response(serializer.data)
+class RecruiterNotificationView(generics.GenericAPIView):
+    serializer_class = serializers.NotificationSerializer
+    permission_classes = [IsRecruiter]
+
+    def get_queryset(self) -> Any:
+        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def get(self, request, *args, **kwargs):
+        notifications = self.get_queryset()
+        serializer = self.get_serializer(notifications, many=True)
+        return Response(serializer.data)
+class JobApplicationStatusUpdateView(generics.UpdateAPIView):
+    queryset = models.JobApplication.objects.all()
+    serializer_class = serializers.JobApplicationStatusSerializer
+    permission_classes = [IsRecruiter]
+class ApplicantDashboardView(generics.ListAPIView):
+    serializer_class = serializers.JobApplicationSerializer
+    permission_classes = [IsApplicant]
+
+    def get_queryset(self) -> Any:
+        return models.JobApplication.objects.filter(applied_by=self.request.user).order_by('-id')

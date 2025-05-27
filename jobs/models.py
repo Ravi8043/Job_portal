@@ -32,13 +32,19 @@ class JobPosting(models.Model):
 
 
 
-class JobApplication(models.Model):
-    applied_by = models.ForeignKey(
-    CustomUserModel,
-    on_delete=models.CASCADE,
-    related_name='job_applications'
-)
+# models.py
 
+class JobApplication(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    )
+    applied_by = models.ForeignKey(
+        CustomUserModel,
+        on_delete=models.CASCADE,
+        related_name='job_applications'
+    )
     job_role = models.ForeignKey(JobPosting, on_delete=models.CASCADE, related_name='application')
     resume = models.FileField(null=True, blank=True)
     cover_letter = models.FileField(null=True, blank=True)
@@ -46,6 +52,11 @@ class JobApplication(models.Model):
     github_link = models.URLField(null=True, blank=True)
     linkedin_link = models.URLField(null=True, blank=True)
     
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+
+    def __str__(self):
+        return f"{self.applied_by.username} - {self.job_role.job_role} ({self.status})"
+ 
 class Notification(models.Model):
     user = models.ForeignKey(CustomUserModel, on_delete=models.CASCADE, related_name="notifications")
     message = models.TextField()
