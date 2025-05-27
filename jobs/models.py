@@ -12,6 +12,13 @@ class JobPosting(models.Model):
         ('city','City'),
         ('hybrid','Hybrid')
     )
+    #we've to establish the relation between JobPosting and our CustomUserModel
+    #coz most of the data we're taking from the user model
+    posted_by = models.ForeignKey(
+    CustomUserModel,
+    on_delete=models.CASCADE,
+    related_name='job_postings'
+)
     job_role = models.CharField(max_length=50)
     skills_required = models.TextField(null=True, blank=True, help_text='skills required')
     description = models.TextField(null=True, blank=True, help_text='describe about job more')
@@ -26,6 +33,12 @@ class JobPosting(models.Model):
 
 
 class JobApplication(models.Model):
+    applied_by = models.ForeignKey(
+    CustomUserModel,
+    on_delete=models.CASCADE,
+    related_name='job_applications'
+)
+
     job_role = models.ForeignKey(JobPosting, on_delete=models.CASCADE, related_name='application')
     resume = models.FileField(null=True, blank=True)
     cover_letter = models.FileField(null=True, blank=True)

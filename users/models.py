@@ -9,7 +9,7 @@ class CustomUserModel(AbstractUser):
         ('recruiter','recruiter')
     )
     phone_number = models.CharField(max_length=12, null=True, blank=True)
-    role = models.CharField(max_length=30, choices=ROLE_CHOICES, default='applicant')
+    role = models.CharField(max_length=30, choices=ROLE_CHOICES)
     
     def __str__(self):
         return self.username

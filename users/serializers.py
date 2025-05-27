@@ -30,6 +30,14 @@ class CustomRegisterSerializer(RegisterSerializer):
             return  # Just exit if data isn't valid dict
 
         role = validated_data.get('role')
+         # Assign role to the user
+         #the role value has to be saved
+         #its same like form when you get the data we save it right
+         #but we're not doing the same thing to the rest of the fields coz 
+         #it has .objects.create fn which will save the fields
+        if role:
+            user.role = role
+            user.save()  # <- important, don't forget this
 
         if role == 'recruiter':
             RecruiterProfile.objects.create(

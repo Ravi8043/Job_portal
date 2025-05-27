@@ -41,12 +41,19 @@ class JobPostingView(viewsets.ModelViewSet):
     permission_classes = [IsRecruiter]
     queryset = models.JobPosting.objects.all()
     serializer_class = serializers.JobPostingSerializer
+    #as we're not taking posted_by input from the user and need not to
+    #coz it stores the loggin details which user already provided
+    #so we manually override that posted_by using perform_create fn
+    def perform_create(self, serializer):
+        serializer.save(posted_by=self.request.user)  # Crucial line
     
 
 class JobApplicationView(viewsets.ModelViewSet):
     permission_classes = [IsApplicant]
     queryset = models.JobApplication.objects.all()
     serializer_class = serializers.JobApplicationSerializer
+    def perform_create(self, serializer):
+        serializer.save(applied_by=self.request.user)  # Crucial line
     
 # class RecruiterNotificationsView(APIView):
 #     def get(self, request):
