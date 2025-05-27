@@ -18,6 +18,9 @@ class IsRecruiter(permissions.BasePermission):
         return getattr(user, 'role', None) == 'recruiter'  
 
     def has_object_permission(self, request, view, obj):
+        # For job postings, only allow access if the recruiter owns the job
+        if hasattr(obj, 'recruiter'):
+            return obj.recruiter == request.user or request.user.is_superuser
         return self.has_permission(request, view)  
 
 
@@ -25,17 +28,16 @@ class IsApplicant(permissions.BasePermission):
     def has_permission(self, request, view):
         user = request.user
         if not user.is_authenticated:
-            print("you're not authenticated")
             return False   
         if getattr(user, 'is_superuser', False):
-            print('you are a superuser')
             return True    
-        print("🔎 Role: ", getattr(user, 'role', 'No role found'))
         return getattr(user, 'role', None) == 'applicant' 
 
     def has_object_permission(self, request, view, obj):
+        # For job applications, only allow access if the applicant owns the application
+        if hasattr(obj, 'applicant'):
+            return obj.applicant == request.user or request.user.is_superuser
         return self.has_permission(request, view)
-
 
 class JobPostingView(viewsets.ModelViewSet):
     permission_classes = [IsRecruiter]
