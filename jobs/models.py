@@ -36,9 +36,9 @@ class JobPosting(models.Model):
 
 class JobApplication(models.Model):
     STATUS_CHOICES = (
-        ('pending', 'Pending'),
-        ('accepted', 'Accepted'),
-        ('rejected', 'Rejected'),
+        ('pending', 'pending'),
+        ('accepted', 'accepted'),
+        ('rejected', 'rejected'),
     )
     applied_by = models.ForeignKey(
         CustomUserModel,
@@ -52,7 +52,7 @@ class JobApplication(models.Model):
     github_link = models.URLField(null=True, blank=True)
     linkedin_link = models.URLField(null=True, blank=True)
     
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self):
         return f"{self.applied_by.username} - {self.job_role.job_role} ({self.status})"
